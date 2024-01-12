@@ -59,7 +59,8 @@ pipeline {
   -H 'authorization: Basic amVua2luczpKZW5raW5zQGNpdEAzMjE0NTY='
                     """
                     //  -H 'authorization: Basic amVua2luczpKZW5raW5zQGNpdEAzMjE0NTY='
-                    scanResults = sh(script: curlcommand, returnStdout: true).trim()
+                        
+                    scanResults = sh(script: curlcommand2, returnStdout: true).trim()
                     }
                     echo """
                     $scanResults
@@ -84,7 +85,7 @@ pipeline {
                     }
 
                     // Print vulnerability scan results and Harbor link
-                    echo "Vulnerability Scan Results: ${scanResults}"
+                    //echo "Vulnerability Scan Results: ${scanResults}"
                     echo "Harbor URL: ${harborAPIUrl}/harbor/projects/${repository}/repositories/${artifact}/_vulnerability"
                 }
             }
@@ -92,7 +93,8 @@ pipeline {
         stage('DOCKER_SCAN') {
             steps {
                 script {
-                    waitForHarborWebHook fullImageName: 'registry.citglobal.com/cit-local-repo/maven-test:latest', server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
+                    waitForHarborWebHook server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
+                    // waitForHarborWebHook fullImageName: 'registry.citglobal.com/cit-local-repo/maven-test:latest', server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
                     sh "docker rmi ${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}"
                 }
             }
