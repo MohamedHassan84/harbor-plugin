@@ -102,20 +102,20 @@ pipeline {
                     }
 
                     // Print vulnerability scan results and Harbor link
-                    //echo "Vulnerability Scan Results: ${scanResults}"
-                    echo "Harbor URL: ${harborAPIUrl}/harbor/projects/${repository}/repositories/${artifact}/_vulnerability"
+                    echo "Vulnerability Scan Results: ${vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].summary['summary']}"
+                    // echo "Harbor URL: ${harborAPIUrl}/harbor/projects/${repository}/repositories/${artifact}/_vulnerability"
                 }
             }
         }
         }
-        stage('DOCKER_SCAN') {
-            steps {
-                script {
-                    waitForHarborWebHook server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
-                    // waitForHarborWebHook fullImageName: 'registry.citglobal.com/cit-local-repo/maven-test:latest', server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
-                    sh "docker rmi ${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}"
-                }
-            }
-        }
+        // stage('DOCKER_SCAN') {
+        //     steps {
+        //         script {
+        //             waitForHarborWebHook server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
+        //             // waitForHarborWebHook fullImageName: 'registry.citglobal.com/cit-local-repo/maven-test:latest', server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
+        //             sh "docker rmi ${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}"
+        //         }
+        //     }
+        // }
     }
 }
