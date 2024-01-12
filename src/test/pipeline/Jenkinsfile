@@ -44,15 +44,23 @@ pipeline {
                     // Use the credentials you configured
                     withCredentials([usernamePassword(credentialsId: 'registry-citglobal-com', usernameVariable: 'HARBOR_USERNAME', passwordVariable: 'HARBOR_PASSWORD')]) {
                     // Fetch vulnerability scan results
-                    scanResults = sh(script: "curl -X 'GET' -s -u $HARBOR_USERNAME:$HARBOR_PASSWORD $harborAPIUrl/api/v2.0/projects/cit-local-repo/repositories/$repository/artifacts/$artifact?page=1&page_size=10&with_tag=true&with_label=false&with_scan_overview=true&with_accessory=false&with_signature=false&with_immutable_status=false", returnStdout: true).trim()
+                    def curlcommand="""
+                        curl -X 'GET' -u $HARBOR_USERNAME:$HARBOR_PASSWORD \
+                        'http://registry.citglobal.com/api/v2.0/projects/cit-local-repo/repositories/maven-test/artifacts/latest?page=1&page_size=10&with_tag=true&with_label=false&with_scan_overview=true&with_accessory=false&with_signature=true&with_immutable_status=false' \
+                        -H 'accept: application/json' \
+                        -H 'X-Accept-Vulnerabilities: application/vnd.security.vulnerability.report; version=1.1, application/vnd.scanner.adapter.vuln.report.harbor+json; version=1.0' \
+                       
+                    """
+                        //  -H 'authorization: Basic amVua2luczpKZW5raW5zQGNpdEAzMjE0NTY='
+                    scanResults = sh(script: curlcommand, returnStdout: true).trim()
                     }
                     echo """
-                    ${scanResults}
+                    $scanResults
                     """
                     // Parse and evaluate scan results
                     def vulnerabilities = readJSON text: scanResults
                      echo """
-                    ${vulnerabilities}
+                    $vulnerabilities
                     """
                     if (vulnerabilities.summary.critical > 0 || vulnerabilities.summary.high > 0) {
                         echo "High or critical vulnerabilities found. Build failed."
