@@ -8,7 +8,7 @@ def getBuildDate() {
 pipeline {
     agent any
     environment {
-        harborRegistryUrl = 'http://registry.citglobal.com/'
+        harborRegistryUrl = 'http://registry.citglobal.com'
         harborCredentialId = 'registry-citglobal-com'
         repositoryName = 'cit-local-repo/maven-test'
     }
