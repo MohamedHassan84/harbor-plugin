@@ -71,11 +71,12 @@ pipeline {
                      echo """
                     $vulnerabilities
                     """
-                    def scan_status = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status
-                    if(scan_status && scan_status=="Success"){
+                    // def scan_status = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status
+                    if(vulnerabilities.scan_overview  && vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status=="Success"){
+                        echo " Scan status Success "
                         break 
                     }
-                    if(scan_status && scan_status == "Error"){
+                    if(vulnerabilities.scan_overview  && vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status == "Error"){
                         echo " Scan status Error "
                         break 
                     }
