@@ -59,8 +59,10 @@ pipeline {
                       -H 'authorization: Basic amVua2luczpKZW5raW5zQGNpdEAzMjE0NTY='
                     """
                     //  -H 'authorization: Basic amVua2luczpKZW5raW5zQGNpdEAzMjE0NTY='
+                    def scanStatus = ""
                     for (int i = 2; i > 1; i++) 
                     {    
+                    sleep(time: 5)
                     scanResults = sh(script: curlcommand2, returnStdout: true).trim()
                     
                     echo """
@@ -71,15 +73,18 @@ pipeline {
                      echo """
                     $vulnerabilities
                     """
-                    // def scan_status = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status
-                    if(vulnerabilities.scan_overview  && vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status=="Success"){
-                        echo " Scan status Success "
-                        break 
+                    // Check if scan_overview exists and has scan_status property
+                    if (vulnerabilities.scan_overview && vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status) {
+                        scanStatus = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status
+                
+                        if (scanStatus == "Success" || scanStatus == "Error") {
+                            echo "Scan status ${scanStatus}. Breaking out of the loop."
+                            break
+                        }
                     }
-                    if(vulnerabilities.scan_overview  && vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status == "Error"){
-                        echo " Scan status Error "
-                        break 
-                    }
+                            // Sleep for 5 seconds before the next iteration
+                        echo "Scan status not 'Success' or 'Error'. Sleeping for 5 seconds."
+                        
                     } 
                     // Extract scan_status value
                     def CriticalStatus = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].summary['summary'].Critical
