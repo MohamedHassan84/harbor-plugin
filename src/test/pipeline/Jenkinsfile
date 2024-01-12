@@ -28,7 +28,7 @@ pipeline {
                     docker.withRegistry("http://${harborRegistryUrl}", harborCredentialId) {
                         docker.image("${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}").push()
                     }
-                    waitForHarborWebHook server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
+                    waitForHarborWebHook fullImageName : 'registry.citglobal.com/${repositoryName}:${BUILD_NUMBER}' , server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
                     sh "docker rmi ${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}"
                 }
             }
