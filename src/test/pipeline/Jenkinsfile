@@ -62,7 +62,14 @@ pipeline {
                      echo """
                     $vulnerabilities
                     """
-                    if (vulnerabilities.summary.critical > 0 || vulnerabilities.summary.high > 0) {
+                    // Extract scan_status value
+                    def CriticalStatus = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].summary['summary'].Critical
+                    def HighStatus = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].summary['summary'].High
+
+                    // Print the scan_status value
+                    echo "Scan CriticalStatus: ${CriticalStatus} ,  HighStatus: ${HighStatus}"
+                    
+                    if (CriticalStatus > 0 || HighStatus > 0) {
                         echo "High or critical vulnerabilities found. Build failed."
                     } else {
                         echo "No high or critical vulnerabilities found. Proceeding with the pipeline."
