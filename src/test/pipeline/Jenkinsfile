@@ -27,8 +27,14 @@ pipeline {
                 script {
                     docker.withRegistry("http://${harborRegistryUrl}", harborCredentialId) {
                         docker.image("${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}").push()
+                        docker.image("${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}").push("latest")
                     }
-                    waitForHarborWebHook fullImageName : 'registry.citglobal.com/${repositoryName}:${BUILD_NUMBER}' , server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
+                }
+            }
+        stage('DOCKER_SCAN') {
+            steps {
+                script {
+                    waitForHarborWebHook fullImageName: "registry.citglobal.com/cit-local-repo/maven-test:latest", server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
                     sh "docker rmi ${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}"
                 }
             }
