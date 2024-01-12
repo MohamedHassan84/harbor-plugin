@@ -8,9 +8,9 @@ def getBuildDate() {
 pipeline {
     agent any
     environment {
-        harborRegistryUrl = 'harbor.example.com'
-        harborCredentialId = 'harbor_credentials'
-        repositoryName = 'beijing/alpine-test'
+        harborRegistryUrl = 'http://registry.citglobal.com/'
+        harborCredentialId = 'registry-citglobal-com'
+        repositoryName = 'cit-local-repo/maven-test'
     }
     stages {
         stage('DOCKER_BUILD') {
@@ -28,7 +28,7 @@ pipeline {
                     docker.withRegistry("https://${harborRegistryUrl}", harborCredentialId) {
                         docker.image("${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}").push()
                     }
-                    waitForHarborWebHook server: 'Harbor Example', credentialsId: 'harbor_credentials', severity: 'Medium', abortPipeline: true
+                    waitForHarborWebHook server: 'http://registry.citglobal.com/', credentialsId: ${harborCredentialId}, severity: 'Medium', abortPipeline: true
                     sh "docker rmi ${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}"
                 }
             }
