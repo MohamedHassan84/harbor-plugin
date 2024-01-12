@@ -31,6 +31,7 @@ pipeline {
                     }
                 }
             }
+        }
         stage('DOCKER_SCAN') {
             steps {
                 script {
