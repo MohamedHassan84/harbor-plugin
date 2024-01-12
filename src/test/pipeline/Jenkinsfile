@@ -11,6 +11,8 @@ pipeline {
         harborRegistryUrl = 'registry.citglobal.com'
         harborCredentialId = 'registry-citglobal-com'
         repositoryName = 'cit-local-repo/maven-test'
+        HARBOR_USERNAME = credentials('registry-citglobal-com').username
+        HARBOR_PASSWORD = credentials('registry-citglobal-com').password
     }
     stages {
         stage('DOCKER_BUILD') {
@@ -29,6 +31,33 @@ pipeline {
                         docker.image("${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}").push()
                         docker.image("${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}").push("latest")
                     }
+                }
+            }
+        }
+        stage('Check Vulnerability Scan Results') {
+            steps {
+                script {
+                    def harborAPIUrl = 'http://registry.citglobal.com'
+                    def repository = 'cit-local-repo'
+                    def artifact = 'maven-test:latest'
+                    def scanResults = null
+
+                    // Fetch vulnerability scan results
+                    scanResults = sh(script: "curl -s -u $HARBOR_USERNAME:$HARBOR_PASSWORD $harborAPIUrl/api/v2.0/repositories/$repository/artifacts/$artifact/scanOverview", returnStdout: true).trim()
+
+                    // Parse and evaluate scan results
+                    def vulnerabilities = readJSON text: scanResults
+
+                    if (vulnerabilities.summary.critical > 0 || vulnerabilities.summary.high > 0) {
+                        echo "High or critical vulnerabilities found. Build failed."
+                    } else {
+                        echo "No high or critical vulnerabilities found. Proceeding with the pipeline."
+                        // Continue with the pipeline as normal.
+                    }
+
+                    // Print vulnerability scan results and Harbor link
+                    echo "Vulnerability Scan Results: ${scanResults}"
+                    echo "Harbor URL: ${harborAPIUrl}/harbor/projects/${repository}/repositories/${artifact}/_vulnerability"
                 }
             }
         }
