@@ -11,8 +11,8 @@ pipeline {
         harborRegistryUrl = 'registry.citglobal.com'
         harborCredentialId = 'registry-citglobal-com'
         repositoryName = 'cit-local-repo/maven-test'
-        HARBOR_USERNAME = credentials('registry-citglobal-com').username
-        HARBOR_PASSWORD = credentials('registry-citglobal-com').password
+        HARBOR_USERNAME = credentials("registry-citglobal-com").username
+        HARBOR_PASSWORD = credentials("registry-citglobal-com").password
     }
     stages {
         stage('DOCKER_BUILD') {
