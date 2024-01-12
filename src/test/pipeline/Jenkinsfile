@@ -46,9 +46,14 @@ pipeline {
                     // Fetch vulnerability scan results
                     scanResults = sh(script: "curl -s -u $HARBOR_USERNAME:$HARBOR_PASSWORD $harborAPIUrl/api/v2.0/repositories/$repository/artifacts/$artifact/scanOverview", returnStdout: true).trim()
                     }
+                    echo """
+                    ${scanResults}
+                    """
                     // Parse and evaluate scan results
                     def vulnerabilities = readJSON text: scanResults
-
+                     echo """
+                    ${vulnerabilities}
+                    """
                     if (vulnerabilities.summary.critical > 0 || vulnerabilities.summary.high > 0) {
                         echo "High or critical vulnerabilities found. Build failed."
                     } else {
