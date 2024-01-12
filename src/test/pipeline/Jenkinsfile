@@ -44,7 +44,7 @@ pipeline {
                     // Use the credentials you configured
                     withCredentials([usernamePassword(credentialsId: 'registry-citglobal-com', usernameVariable: 'HARBOR_USERNAME', passwordVariable: 'HARBOR_PASSWORD')]) {
                     // Fetch vulnerability scan results
-                    scanResults = sh(script: "curl -X 'GET' -s -u $HARBOR_USERNAME:$HARBOR_PASSWORD $harborAPIUrl/api/v2.0/projects/cit-local-repo/repositories/$repository/artifacts/$artifact/scanOverview", returnStdout: true).trim()
+                    scanResults = sh(script: "curl -X 'GET' -s -u $HARBOR_USERNAME:$HARBOR_PASSWORD $harborAPIUrl/api/v2.0/projects/cit-local-repo/repositories/$repository/artifacts/$artifact?page=1&page_size=10&with_tag=true&with_label=false&with_scan_overview=true&with_accessory=false&with_signature=false&with_immutable_status=false", returnStdout: true).trim()
                     }
                     echo """
                     ${scanResults}
