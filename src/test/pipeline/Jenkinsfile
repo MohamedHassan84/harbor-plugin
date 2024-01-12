@@ -46,7 +46,7 @@ pipeline {
                     // Fetch vulnerability scan results
                     def curlcommand2="""
                         curl -X 'GET' -u $HARBOR_USERNAME:$HARBOR_PASSWORD \
-                        'http://registry.citglobal.com/api/v2.0/projects/cit-local-repo/repositories/maven-test/artifacts/23?page=1&page_size=10&with_tag=true&with_label=false&with_scan_overview=true&with_accessory=false&with_signature=true&with_immutable_status=false' \
+                        'http://registry.citglobal.com/api/v2.0/projects/cit-local-repo/repositories/maven-test/artifacts/latest?page=1&page_size=10&with_tag=true&with_label=false&with_scan_overview=true&with_accessory=false&with_signature=true&with_immutable_status=false' \
                         -H 'accept: application/json' \
                         -H 'X-Accept-Vulnerabilities: application/vnd.security.vulnerability.report; version=1.1, application/vnd.scanner.adapter.vuln.report.harbor+json; version=1.0' \
                        
@@ -59,9 +59,10 @@ pipeline {
   -H 'authorization: Basic amVua2luczpKZW5raW5zQGNpdEAzMjE0NTY='
                     """
                     //  -H 'authorization: Basic amVua2luczpKZW5raW5zQGNpdEAzMjE0NTY='
-                        
+                    for (int i = 2; i > 1; i++) 
+                    {    
                     scanResults = sh(script: curlcommand2, returnStdout: true).trim()
-                    }
+                    
                     echo """
                     $scanResults
                     """
@@ -70,6 +71,14 @@ pipeline {
                      echo """
                     $vulnerabilities
                     """
+                    if(vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status == "Success"){
+                        break 
+                    }
+                    if(vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].scan_status == "Error"){
+                        echo " Scan status Error "
+                        break 
+                    }
+                    } 
                     // Extract scan_status value
                     def CriticalStatus = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].summary['summary'].Critical
                     def HighStatus = vulnerabilities.scan_overview['application/vnd.security.vulnerability.report; version=1.1'].summary['summary'].High
