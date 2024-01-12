@@ -8,7 +8,7 @@ def getBuildDate() {
 pipeline {
     agent any
     environment {
-        harborRegistryUrl = 'http://registry.citglobal.com'
+        harborRegistryUrl = 'registry.citglobal.com'
         harborCredentialId = 'registry-citglobal-com'
         repositoryName = 'cit-local-repo/maven-test'
     }
@@ -25,7 +25,7 @@ pipeline {
         stage('DOCKER_PUSH') {
             steps {
                 script {
-                    docker.withRegistry("https://${harborRegistryUrl}", harborCredentialId) {
+                    docker.withRegistry("http://${harborRegistryUrl}", harborCredentialId) {
                         docker.image("${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}").push()
                     }
                     waitForHarborWebHook server: 'http://registry.citglobal.com/', credentialsId: ${harborCredentialId}, severity: 'Medium', abortPipeline: true
