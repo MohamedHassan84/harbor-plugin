@@ -60,6 +60,7 @@ pipeline {
                     """
                     //  -H 'authorization: Basic amVua2luczpKZW5raW5zQGNpdEAzMjE0NTY='
                     def scanStatus = ""
+                    def vulnerabilities= ""
                     for (int i = 2; i > 1; i++) 
                     {    
                     sleep(time: 5)
@@ -69,7 +70,7 @@ pipeline {
                     $scanResults
                     """
                     // Parse and evaluate scan results
-                    def vulnerabilities = readJSON text: scanResults
+                    vulnerabilities = readJSON text: scanResults
                      echo """
                     $vulnerabilities
                     """
