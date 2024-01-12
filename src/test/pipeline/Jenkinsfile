@@ -35,7 +35,7 @@ pipeline {
         stage('DOCKER_SCAN') {
             steps {
                 script {
-                    waitForHarborWebHook fullImageName: "registry.citglobal.com/cit-local-repo/maven-test:latest", server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
+                    waitForHarborWebHook fullImageName: 'registry.citglobal.com/cit-local-repo/maven-test:latest', server: 'registry.citglobal.com', credentialsId: 'registry-citglobal-com', severity: 'Medium', abortPipeline: false
                     sh "docker rmi ${harborRegistryUrl}/${repositoryName}:${BUILD_NUMBER}"
                 }
             }
