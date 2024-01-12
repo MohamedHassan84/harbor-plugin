@@ -38,13 +38,13 @@ pipeline {
             steps {
                 script {
                     def harborAPIUrl = 'http://registry.citglobal.com'
-                    def repository = 'cit-local-repo'
-                    def artifact = 'maven-test:latest'
+                    def repository = 'maven-test'
+                    def artifact = 'latest'
                     def scanResults = null
                     // Use the credentials you configured
                     withCredentials([usernamePassword(credentialsId: 'registry-citglobal-com', usernameVariable: 'HARBOR_USERNAME', passwordVariable: 'HARBOR_PASSWORD')]) {
                     // Fetch vulnerability scan results
-                    scanResults = sh(script: "curl -s -u $HARBOR_USERNAME:$HARBOR_PASSWORD $harborAPIUrl/api/v2.0/repositories/$repository/artifacts/$artifact/scanOverview", returnStdout: true).trim()
+                    scanResults = sh(script: "curl -X 'GET' -s -u $HARBOR_USERNAME:$HARBOR_PASSWORD $harborAPIUrl/api/v2.0/projects/cit-local-repo/repositories/$repository/artifacts/$artifact/scanOverview", returnStdout: true).trim()
                     }
                     echo """
                     ${scanResults}
